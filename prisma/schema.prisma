@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+ //  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+    DEVELOPER
+    MANAGER
+    TEAM_LEAD
+    ADMIN
+}
+
+enum TaskStatus {
+    TODO
+    IN_PROGRESS
+    REVIEW
+    DONE
+}
+
+enum TaskPriority {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+}
+
+model User {
+    id String @id @default(cuid())
+    email String @unique
+    name String
+    password String
+    role Role @default(DEVELOPER)
+    avatar String?
+    refreshToken String?
+    isActive Boolean @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    projectMembers ProjectMember[]
+    assignedTasks Task[] @relation("AssignedUser")
+    createdTasks Task[] @relation("CreatedBy")
+    createdProjects Project[] @relation("CreatedBy")
+
+    @@map("users")
+}
+
+model Project {
+    id String @id @default(cuid())
+    name String
+    description String?
+    startDate DateTime @default(now())
+    endDate DateTime?
+    isActive Boolean @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    createdBy String
+    creator User @relation("CreatedBy", fields: [createdBy], references: [id] )
+    members ProjectMember[]
+    tasks Task[]
+
+    @@map("projects")
+}
+
+model ProjectMember {
+    id String @id @default(cuid())
+    userId String
+    projectId String
+    joinedAt DateTime @default(now())
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, projectId])
+    @@map("project_members")
+}
+
+model Task {
+    id String @id @default(cuid())
+    title String
+    description String?
+    status TaskStatus @default(TODO)
+    priority TaskPriority @default(MEDIUM)
+    dueDate DateTime?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    projectId String
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    assignedTo String?
+    assignee User? @relation("AssignedUser",fields: [assignedTo], references: [id])
+    createdBy String
+    creator User @relation("CreatedBy", fields: [createdBy], references: [id])
+
+
+    @@map("tasks")
+}
