@@ -4,6 +4,7 @@ import { join } from 'path';
 import { AuthModule } from 'src/auth/auth.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { UsersModule } from 'src/users/users.module';
+import { ProjectsModule } from 'src/projects/projects.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from 'src/users/users.module';
     AuthModule,
     PrismaModule,
     UsersModule,
+    ProjectsModule,
   ],
   controllers: [],
   providers: [],
