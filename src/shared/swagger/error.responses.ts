@@ -18,6 +18,15 @@ export class UnauthorizedErrorResponse {
   statusCode: number;
 }
 
+export class BadRequestErrorResponse {
+  @ApiProperty({ example: 'Validation failed' })
+  message: string;
+  @ApiProperty({ example: 'Bad Request' })
+  error: string;
+  @ApiProperty({ example: 400 })
+  statusCode: number;
+}
+
 export const COMMON_ERROR_RESPONSES = {
   NOT_FOUND: {
     description: 'resource not found',
@@ -26,5 +35,9 @@ export const COMMON_ERROR_RESPONSES = {
   UNAUTHORIZED: {
     description: 'unauthorized access',
     type: UnauthorizedErrorResponse,
+  },
+  BAD_REQUEST: {
+    description: 'invalid request data',
+    type: BadRequestErrorResponse,
   },
 } as const;
