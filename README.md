@@ -1,98 +1,130 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Dashboard Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Бэкенд для MVP системы управления проектами и задачами внутри IT-команды.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Описание
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+**Dashboard** — это REST API для управления проектами, задачами и ролями пользователей.
+Реализована строгая ролевая модель, персональный дэшборд, real-time уведомления и удобный запуск.
 
-## Project setup
+---
 
-```bash
-$ bun install
-```
+## Функционал
 
-## Compile and run the project
+- Регистрация и аутентификация пользователей (JWT)
+- Гибкая система ролей: DEVELOPER, MANAGER, TEAM_LEAD, ADMIN
+- Создание проектов (только MANAGER или TEAM_LEAD)
+- Добавление/удаление участников проекта (только создатель)
+- Создание задач внутри проектов и назначение их на других участников
+- Изменение статуса и исполнителя задачи
+- Персональный дэшборд: каждый пользователь видит только свои проекты и задачи
+- Реализация real-time уведомлений через WebSocket (bonus)
+- Согласованность данных: уведомления и действия атомарны, все данные хранятся в PostgreSQL
 
-```bash
-# development
-$ bun run start
+---
 
-# watch mode
-$ bun run start:dev
+## Ролевая модель
 
-# production mode
-$ bun run start:prod
-```
+- MANAGER/TEAM_LEAD — могут создавать проекты, управлять участниками, назначать задачи
+- DEVELOPER — может видеть только свои проекты и задачи, менять статус только своих задач
+- ADMIN — полный доступ (по умолчанию не используется для обычных операций)
+- Доступ к проектам и задачам строго ограничен: пользователь видит только то, где он участник
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ bun run test
+## Технологии
 
-# e2e tests
-$ bun run test:e2e
+- Node.js + NestJS
+- PostgreSQL (через Prisma ORM)
+- Swagger (автогенерация документации)
+- WebSocket (реализация real-time уведомлений)
 
-# test coverage
-$ bun run test:cov
-```
+---
 
-## Deployment
+## Быстрый старт (локально)
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+1. Скопируйте `.env.example` и `.env.development.example` в `.env` и `.env.development`:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+   ```bash
+   cp .env.example .env
+   cp .env.development.example .env.development
+   ```
 
-```bash
-$ bun install -g mau
-$ mau deploy
-```
+   Заполните переменные в этих файлах под свою среду.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+2. Установите зависимости:
 
-## Resources
+   ```bash
+   npm install
+   ```
 
-Check out a few resources that may come in handy when working with NestJS:
+3. Примените миграции:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+   ```bash
+   npx prisma migrate deploy
+   ```
 
-## Support
+4. Запустите приложение:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+   ```bash
+   npm run start:dev
+   ```
 
-## Stay in touch
+5. Приложение будет доступно:
+   - API: http://localhost:6001
+   - Swagger: http://localhost:6001/api
+   - PostgreSQL: localhost:5432
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## Основные эндпоинты
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- `/auth/register` — регистрация пользователя
+- `/auth/login` — аутентификация (JWT)
+- `/projects` — CRUD проектов (создание только MANAGER/TEAM_LEAD)
+- `/projects/:id/members` — управление участниками проекта
+- `/tasks/project/:projectId` — создание задачи в проекте
+- `/tasks/:id` — обновление/удаление задачи (создатель или исполнитель)
+- `/tasks/my` — персональный дэшборд задач пользователя
+- `/ws` — WebSocket для real-time уведомлений
+
+---
+
+## Реализация real-time (bonus)
+
+- При изменении статуса задачи или назначении исполнителя, менеджер проекта получает уведомление мгновенно через WebSocket.
+- Уведомления хранятся в базе и доступны после перезапуска.
+- Система устойчива к сбоям и поддерживает согласованность данных.
+
+---
+
+## Как проверить real-time уведомления
+
+1. Получите JWT токен через `/auth/login`.
+2. Подключитесь к WebSocket (`ws://localhost:6001`) с помощью клиента (например, [websocat](https://github.com/vi/websocat) или браузерной утилиты).
+3. Совершите действие (например, смените статус задачи через API).
+4. Получите уведомление в реальном времени.
+
+---
+
+## Структура проекта
+
+- `src/` — исходный код приложения
+- `prisma/` — схема и миграции базы данных
+- `.env`, `.env.development` — переменные окружения (см. `.env.example`, `.env.development.example`)
+
+---
+
+## Swagger-документация
+
+Доступна по адресу:
+[http://localhost:6001/api](http://localhost:6001/api)
+
+---
+
+## Примечания
+
+- Все бизнес-правила и ограничения реализованы строго по ТЗ.
+- Код покрыт типами, архитектура модульная, легко расширяется.

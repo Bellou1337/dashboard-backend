@@ -1,5 +1,17 @@
 import { TaskStatus, TaskPriority } from '@prisma/client';
 
+interface UserBasic {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+interface ProjectBasic {
+  id: string;
+  name: string;
+}
+
 export interface TaskWithDetails {
   id: string;
   title: string;
@@ -12,20 +24,7 @@ export interface TaskWithDetails {
   projectId: string;
   assignedTo: string | null;
   createdBy: string;
-  assignee: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  } | null;
-  creator: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
-  project: {
-    id: string;
-    name: string;
-  };
+  assignee: UserBasic | null;
+  creator: UserBasic;
+  project: ProjectBasic;
 }
