@@ -21,7 +21,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RoleGuard } from 'src/shared/guards';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { TasksService } from './tasks.service';
-import { TaskWithDetails } from './types/task.types';
+import { TaskWithDetails } from './types';
 import { TASK_RESPONSES, TaskDeletedResponse } from './swagger/task-responses';
 
 @ApiTags('tasks')

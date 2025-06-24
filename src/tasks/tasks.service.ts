@@ -6,11 +6,15 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
-import { TaskWithDetails } from './types/task.types';
+import { TaskWithDetails } from './types';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async create(
     projectId: string,
@@ -41,6 +45,24 @@ export class TasksService {
         },
       },
     });
+
+    if (createTaskDto.assignedTo) {
+      const creator = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true },
+      });
+
+      if (creator) {
+        await this.notificationsService.createTaskAssignedNotification(
+          projectId,
+          task.id,
+          task.title,
+          createTaskDto.assignedTo,
+          userId,
+          creator.name,
+        );
+      }
+    }
 
     return task;
   }
@@ -155,6 +177,10 @@ export class TasksService {
       );
     }
 
+    const isStatusChanged =
+      updateTaskDto.status && updateTaskDto.status !== task.status;
+    const previousStatus = task.status;
+
     const updatedTask = await this.prisma.task.update({
       where: { id },
       data: {
@@ -174,6 +200,46 @@ export class TasksService {
         },
       },
     });
+
+    if (isStatusChanged && updateTaskDto.status) {
+      const actor = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true },
+      });
+
+      if (actor) {
+        await this.notificationsService.createTaskStatusNotification(
+          task.projectId,
+          task.id,
+          task.title,
+          previousStatus,
+          updateTaskDto.status,
+          userId,
+          actor.name,
+        );
+      }
+    }
+
+    if (
+      updateTaskDto.assignedTo &&
+      updateTaskDto.assignedTo !== task.assignedTo
+    ) {
+      const actor = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true },
+      });
+
+      if (actor) {
+        await this.notificationsService.createTaskAssignedNotification(
+          task.projectId,
+          task.id,
+          task.title,
+          updateTaskDto.assignedTo,
+          userId,
+          actor.name,
+        );
+      }
+    }
 
     return updatedTask;
   }
